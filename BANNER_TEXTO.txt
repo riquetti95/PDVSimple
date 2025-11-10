@@ -1,0 +1,153 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                                                                              ║
+║                    💰 SIMPLEVENDAS - SISTEMA PDV COMPLETO                    ║
+║                                                                              ║
+║                    Gerencie sua loja com eficiência máxima!                  ║
+║                                                                              ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+🎯 POR QUE ESCOLHER O SIMPLEVENDAS?
+
+  ✓ 100% OFFLINE - Funciona sem internet
+  ✓ 4 NÍVEIS DE ACESSO - Vendedor, Conferente, Gerente e Admin
+  ✓ 8+ MÓDULOS PRINCIPAIS - Sistema completo
+  ✓ ZERO MENSALIDADES - Licença única
+  ✓ INTERFACE MODERNA - Fácil de usar
+  ✓ BACKUP AUTOMÁTICO - Seus dados protegidos
+
+═══════════════════════════════════════════════════════════════════════════════
+
+📦 FUNCIONALIDADES PRINCIPAIS
+
+🛒 VENDAS
+  • Registro completo de vendas
+  • Cancelamento com reversão automática de estoque
+  • Cupom não fiscal integrado
+  • Histórico completo de vendas
+  • Descontos e observações
+  • Seleção de cliente e produtos
+
+📦 CONTROLE DE ESTOQUE
+  • Controle automático de estoque
+  • Alertas de estoque mínimo
+  • Movimentações registradas (Entrada, Saída, Ajuste, Cancelamento)
+  • Histórico completo de movimentações
+  • Relatórios de produtos com estoque baixo
+
+👥 CADASTRO DE CLIENTES
+  • Cadastro completo com todos os dados
+  • Busca rápida e eficiente
+  • Dados de contato completos
+  • Endereço completo
+  • Observações e histórico
+
+📋 CADASTRO DE PRODUTOS
+  • Cadastro completo de produtos
+  • Fotos dos produtos
+  • Código de barras
+  • Preço de venda e custo
+  • Categorias e unidades de medida
+  • Controle de estoque mínimo
+
+💰 FECHAMENTO DE CAIXA
+  • Abertura e fechamento de caixa
+  • Relatórios diários completos
+  • Controle de vendas e cancelamentos
+  • Cálculo automático de totais
+  • Histórico de fechamentos
+  • Valor esperado vs. valor final
+
+📊 ORÇAMENTOS
+  • Criação de orçamentos detalhados
+  • Conversão automática em vendas
+  • Controle de status (Aberto, Aprovado, Cancelado, Vendido)
+  • Validade configurável
+  • Histórico completo
+
+🔐 SEGURANÇA E ACESSO
+  • Sistema de login seguro
+  • 4 níveis de acesso (Vendedor, Conferente, Gerente, Admin)
+  • Controle de permissões por nível
+  • Senhas criptografadas (SHA256)
+  • Backup automático ao fechar
+
+⚙️ CONFIGURAÇÕES
+  • Dados completos da empresa
+  • Logo personalizado
+  • Gerenciamento de usuários
+  • Backup manual e automático
+  • Interface moderna e intuitiva
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🔧 ESPECIFICAÇÕES TÉCNICAS
+
+  Plataforma:        Python 3.7+ com Tkinter
+  Banco de Dados:    SQLite (Offline, sem necessidade de internet)
+  Sistema:           Windows, Linux, Mac
+  Instalação:        Simples, sem dependências complexas
+  Executável:        Pode ser gerado (.exe, .app, etc)
+  Interface:         Moderna, intuitiva e responsiva
+
+═══════════════════════════════════════════════════════════════════════════════
+
+📊 NÍVEIS DE ACESSO
+
+  👤 VENDEDOR
+     • Realizar vendas
+     • Criar orçamentos
+     • Consultar produtos e clientes
+     • Visualizar estoque
+
+  👨‍💼 CONFERENTE
+     • Todas as funções do Vendedor
+     • Ajustar estoque
+     • Visualizar movimentações
+
+  👔 GERENTE
+     • Todas as funções do Conferente
+     • Configurar dados da empresa
+     • Aprovar orçamentos
+     • Cancelar vendas
+     • Fechamento de caixa
+
+  👑 ADMIN
+     • Todas as funções do Gerente
+     • Gerenciar usuários
+     • Acesso total ao sistema
+
+═══════════════════════════════════════════════════════════════════════════════
+
+✨ DIFERENCIAIS
+
+  ✓ Sistema 100% offline - não precisa de internet
+  ✓ Banco de dados local - seus dados ficam seguros
+  ✓ Interface moderna e intuitiva
+  ✓ Código limpo e bem estruturado
+  ✓ Fácil instalação e configuração
+  ✓ Suporte a múltiplos usuários
+  ✓ Backup automático de dados
+  ✓ Relatórios completos
+  ✓ Validações inteligentes
+  ✓ Tratamento de erros robusto
+
+═══════════════════════════════════════════════════════════════════════════════
+
+🚀 PRONTO PARA COMEÇAR?
+
+  Adquira agora o SimpleVendas e transforme a gestão da sua loja!
+
+  💼 Licença única
+  📦 Instalação incluída
+  🎓 Treinamento disponível
+
+═══════════════════════════════════════════════════════════════════════════════
+
+📞 ENTRE EM CONTATO
+
+  Para mais informações, demonstração ou orçamento personalizado:
+
+  SimpleVendas - Sistema PDV Completo
+
+═══════════════════════════════════════════════════════════════════════════════
+

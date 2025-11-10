@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SimpleVendas - Sistema PDV Completo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .banner {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 1200px;
+            width: 100%;
+            overflow: hidden;
+            animation: fadeIn 0.8s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .header h1 {
+            font-size: 3.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            position: relative;
+            z-index: 1;
+        }
+
+        .header .subtitle {
+            font-size: 1.5em;
+            opacity: 0.95;
+            position: relative;
+            z-index: 1;
+        }
+
+        .content {
+            padding: 50px;
+        }
+
+        .tagline {
+            text-align: center;
+            font-size: 1.3em;
+            color: #666;
+            margin-bottom: 40px;
+            font-weight: 300;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .feature-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 30px;
+            border-radius: 15px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-left: 5px solid #2196F3;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        .feature-card h3 {
+            color: #2196F3;
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .feature-card .icon {
+            font-size: 1.8em;
+        }
+
+        .feature-card ul {
+            list-style: none;
+            color: #555;
+            line-height: 1.8;
+        }
+
+        .feature-card ul li {
+            padding: 5px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        .feature-card ul li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #4CAF50;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .highlights {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 15px;
+            margin-bottom: 40px;
+        }
+
+        .highlights h2 {
+            font-size: 2em;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .highlights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .highlight-item {
+            text-align: center;
+            padding: 20px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        .highlight-item .number {
+            font-size: 3em;
+            font-weight: bold;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .highlight-item .label {
+            font-size: 1.1em;
+            opacity: 0.95;
+        }
+
+        .tech-specs {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 40px;
+        }
+
+        .tech-specs h2 {
+            color: #2196F3;
+            font-size: 2em;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .specs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .spec-item {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .spec-item strong {
+            color: #2196F3;
+            display: block;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+
+        .cta-section {
+            text-align: center;
+            padding: 40px;
+            background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
+            color: white;
+            border-radius: 15px;
+        }
+
+        .cta-section h2 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        .cta-section p {
+            font-size: 1.3em;
+            margin-bottom: 30px;
+            opacity: 0.95;
+        }
+
+        .price {
+            font-size: 3em;
+            font-weight: bold;
+            margin: 20px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .contact-info {
+            background: #2c3e50;
+            color: white;
+            padding: 30px;
+            text-align: center;
+            border-radius: 15px;
+            margin-top: 30px;
+        }
+
+        .contact-info h3 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+        }
+
+        .contact-info p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+            .banner {
+                box-shadow: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
+            .header .subtitle {
+                font-size: 1.2em;
+            }
+            .content {
+                padding: 30px 20px;
+            }
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="banner">
+        <div class="header">
+            <h1>💰 SimpleVendas</h1>
+            <div class="subtitle">Sistema PDV Completo e Profissional</div>
+        </div>
+
+        <div class="content">
+            <p class="tagline">
+                <strong>Gerencie sua loja com eficiência!</strong><br>
+                Sistema completo de vendas, estoque, clientes e muito mais.
+            </p>
+
+            <div class="highlights">
+                <h2>🎯 Por que escolher o SimpleVendas?</h2>
+                <div class="highlights-grid">
+                    <div class="highlight-item">
+                        <span class="number">100%</span>
+                        <span class="label">Offline</span>
+                    </div>
+                    <div class="highlight-item">
+                        <span class="number">4</span>
+                        <span class="label">Níveis de Acesso</span>
+                    </div>
+                    <div class="highlight-item">
+                        <span class="number">8+</span>
+                        <span class="label">Módulos Principais</span>
+                    </div>
+                    <div class="highlight-item">
+                        <span class="number">0</span>
+                        <span class="label">Mensalidades</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <h3><span class="icon">🛒</span> Vendas</h3>
+                    <ul>
+                        <li>Registro completo de vendas</li>
+                        <li>Cancelamento com reversão automática</li>
+                        <li>Cupom não fiscal integrado</li>
+                        <li>Histórico completo de vendas</li>
+                        <li>Descontos e observações</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <h3><span class="icon">📦</span> Estoque</h3>
+                    <ul>
+                        <li>Controle automático de estoque</li>
+                        <li>Alertas de estoque mínimo</li>
+                        <li>Movimentações registradas</li>
+                        <li>Entrada, saída e ajustes</li>
+                        <li>Histórico completo</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <h3><span class="icon">👥</span> Clientes</h3>
+                    <ul>
+                        <li>Cadastro completo de clientes</li>
+                        <li>Busca rápida e eficiente</li>
+                        <li>Histórico de compras</li>
+                        <li>Dados de contato completos</li>
+                        <li>Endereço completo</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <h3><span class="icon">📋</span> Produtos</h3>
+                    <ul>
+                        <li>Cadastro completo de produtos</li>
+                        <li>Fotos dos produtos</li>
+                        <li>Código de barras</li>
+                        <li>Preço de venda e custo</li>
+                        <li>Categorias e unidades</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <h3><span class="icon">💰</span> Caixa</h3>
+                    <ul>
+                        <li>Abertura e fechamento de caixa</li>
+                        <li>Relatórios diários</li>
+                        <li>Controle de vendas e cancelamentos</li>
+                        <li>Cálculo automático de totais</li>
+                        <li>Histórico de fechamentos</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <h3><span class="icon">📊</span> Orçamentos</h3>
+                    <ul>
+                        <li>Criação de orçamentos</li>
+                        <li>Conversão em vendas</li>
+                        <li>Controle de status</li>
+                        <li>Validade configurável</li>
+                        <li>Histórico completo</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <h3><span class="icon">🔐</span> Segurança</h3>
+                    <ul>
+                        <li>Sistema de login seguro</li>
+                        <li>4 níveis de acesso</li>
+                        <li>Controle de permissões</li>
+                        <li>Senhas criptografadas</li>
+                        <li>Backup automático</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <h3><span class="icon">⚙️</span> Configurações</h3>
+                    <ul>
+                        <li>Dados da empresa</li>
+                        <li>Logo personalizado</li>
+                        <li>Gerenciamento de usuários</li>
+                        <li>Backup de dados</li>
+                        <li>Interface moderna</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="tech-specs">
+                <h2>🔧 Especificações Técnicas</h2>
+                <div class="specs-grid">
+                    <div class="spec-item">
+                        <strong>Plataforma:</strong>
+                        Python 3.7+ com Tkinter
+                    </div>
+                    <div class="spec-item">
+                        <strong>Banco de Dados:</strong>
+                        SQLite (Offline, sem internet)
+                    </div>
+                    <div class="spec-item">
+                        <strong>Sistema Operacional:</strong>
+                        Windows, Linux, Mac
+                    </div>
+                    <div class="spec-item">
+                        <strong>Instalação:</strong>
+                        Simples, sem dependências complexas
+                    </div>
+                    <div class="spec-item">
+                        <strong>Executável:</strong>
+                        Pode ser gerado (.exe, .app, etc)
+                    </div>
+                    <div class="spec-item">
+                        <strong>Interface:</strong>
+                        Moderna e intuitiva
+                    </div>
+                </div>
+            </div>
+
+            <div class="cta-section">
+                <h2>🚀 Pronto para começar?</h2>
+                <p>Adquira agora o SimpleVendas e transforme a gestão da sua loja!</p>
+                <div class="price">Sob Consulta</div>
+                <p style="font-size: 1em; margin-top: 20px;">
+                    💼 Licença única | 📦 Instalação incluída | 🎓 Treinamento disponível
+                </p>
+            </div>
+
+            <div class="contact-info">
+                <h3>📞 Entre em Contato</h3>
+                <p>Para mais informações, demonstração ou orçamento personalizado</p>
+                <p style="margin-top: 15px; font-size: 1.2em;">
+                    <strong>SimpleVendas - Sistema PDV Completo</strong>
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

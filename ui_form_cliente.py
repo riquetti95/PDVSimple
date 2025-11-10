@@ -281,6 +281,8 @@ class FormClienteWindow:
             if self.callback:
                 self.callback()
             self.window.destroy()
+        except ValueError as e:
+            messagebox.showerror("Erro de Validação", str(e))
         except Exception as e:
             messagebox.showerror("Erro", f"Erro ao salvar cliente: {str(e)}")
 

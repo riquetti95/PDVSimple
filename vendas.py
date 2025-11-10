@@ -18,52 +18,102 @@ class Vendas:
     
     def create(self, cliente_id, usuario_id, itens, orcamento_id=None, desconto=0, observacoes=''):
         """Cria uma nova venda e baixa o estoque automaticamente"""
+        # Validações
+        if not itens or len(itens) == 0:
+            raise ValueError("A venda deve conter pelo menos um item!")
+        
+        if not usuario_id:
+            raise ValueError("Usuário não informado!")
+        
+        # Validar estoque antes de criar a venda
+        from produtos import Produtos
+        produtos = Produtos()
+        
+        for item in itens:
+            produto = produtos.get_by_id(item['produto_id'])
+            if not produto:
+                raise ValueError(f"Produto ID {item['produto_id']} não encontrado!")
+            
+            if not produto.get('ativo', 1):
+                raise ValueError(f"Produto {produto.get('descricao', '')} está inativo!")
+            
+            if produto.get('estoque_atual', 0) < item['quantidade']:
+                raise ValueError(f"Estoque insuficiente para o produto {produto.get('descricao', '')}! "
+                               f"Estoque disponível: {produto.get('estoque_atual', 0)}")
+        
+        # Validar desconto
+        valor_total = sum(item['subtotal'] for item in itens)
+        if desconto < 0:
+            desconto = 0
+        if desconto > valor_total:
+            raise ValueError(f"Desconto não pode ser maior que o valor total da venda!")
+        
+        valor_final = valor_total - desconto
+        if valor_final < 0:
+            valor_final = 0
+        
+        # Gerar número da venda
         numero = self.gerar_numero()
         
-        valor_total = sum(item['subtotal'] for item in itens)
-        valor_final = valor_total - desconto
-        
-        venda_id = self.db.execute_insert('''
-            INSERT INTO vendas (
-                numero, cliente_id, usuario_id, orcamento_id, valor_total, desconto, valor_final, observacoes
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        ''', (numero, cliente_id, usuario_id, orcamento_id, valor_total, desconto, valor_final, observacoes))
-        
-        # Inserir itens
-        for item in itens:
-            self.db.execute_insert('''
-                INSERT INTO venda_itens (
-                    venda_id, produto_id, quantidade, preco_unitario, subtotal
-                ) VALUES (?, ?, ?, ?, ?)
-            ''', (
-                venda_id,
-                item['produto_id'],
-                item['quantidade'],
-                item['preco_unitario'],
-                item['subtotal']
-            ))
-        
-        # Baixar estoque automaticamente
-        self.estoque.baixar_estoque_venda(venda_id, usuario_id)
-        
-        return venda_id
+        try:
+            # Criar venda
+            venda_id = self.db.execute_insert('''
+                INSERT INTO vendas (
+                    numero, cliente_id, usuario_id, orcamento_id, valor_total, desconto, valor_final, observacoes
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (numero, cliente_id, usuario_id, orcamento_id, valor_total, desconto, valor_final, observacoes))
+            
+            # Inserir itens
+            for item in itens:
+                self.db.execute_insert('''
+                    INSERT INTO venda_itens (
+                        venda_id, produto_id, quantidade, preco_unitario, subtotal
+                    ) VALUES (?, ?, ?, ?, ?)
+                ''', (
+                    venda_id,
+                    item['produto_id'],
+                    item['quantidade'],
+                    item['preco_unitario'],
+                    item['subtotal']
+                ))
+            
+            # Baixar estoque automaticamente
+            self.estoque.baixar_estoque_venda(venda_id, usuario_id)
+            
+            return venda_id
+        except Exception as e:
+            # Se houver erro, tentar reverter (se a venda foi criada)
+            raise Exception(f"Erro ao criar venda: {str(e)}")
     
     def cancelar(self, venda_id, usuario_id):
         """Cancela uma venda e reverte o estoque"""
+        # Validações
+        if not venda_id:
+            raise ValueError("ID da venda não informado!")
+        
+        if not usuario_id:
+            raise ValueError("Usuário não informado!")
+        
         # Verificar se a venda existe e não está cancelada
         venda = self.get_by_id(venda_id)
-        if not venda or venda['status'] == 'Cancelada':
-            return False
+        if not venda:
+            raise ValueError("Venda não encontrada!")
         
-        # Reverter estoque
-        self.estoque.reverter_estoque_venda(venda_id, usuario_id)
+        if venda['status'] == 'Cancelada':
+            raise ValueError("Esta venda já foi cancelada!")
         
-        # Atualizar status
-        self.db.execute_query('''
-            UPDATE vendas SET status = 'Cancelada' WHERE id = ?
-        ''', (venda_id,))
-        
-        return True
+        try:
+            # Reverter estoque
+            self.estoque.reverter_estoque_venda(venda_id, usuario_id)
+            
+            # Atualizar status
+            self.db.execute_query('''
+                UPDATE vendas SET status = 'Cancelada' WHERE id = ?
+            ''', (venda_id,))
+            
+            return True
+        except Exception as e:
+            raise Exception(f"Erro ao cancelar venda: {str(e)}")
     
     def get_by_id(self, venda_id):
         """Busca venda por ID"""

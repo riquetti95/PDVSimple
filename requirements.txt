@@ -7,14 +7,11 @@
 # Banco de dados (já incluído no Python padrão)
 # sqlite3 - já vem com Python
 
-# Não são necessárias dependências externas para a versão básica
-# O sistema usa apenas bibliotecas padrão do Python
+# Dependências obrigatórias:
+Pillow>=9.0.0  # Para manipulação de imagens (fotos de produtos)
 
 # Para gerar executável (.exe), instale:
 # pip install pyinstaller
-
-# Para criar ícone personalizado (opcional):
-# pip install Pillow
 
 # Para melhorar a interface (opcional):
 # pip install ttkthemes

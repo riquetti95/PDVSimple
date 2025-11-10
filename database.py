@@ -20,7 +20,10 @@ class Database:
     
     def get_connection(self):
         """Retorna uma conexão com o banco de dados"""
-        return sqlite3.connect(self.db_path)
+        conn = sqlite3.connect(self.db_path)
+        # Garantir que foreign keys estão habilitadas
+        conn.execute('PRAGMA foreign_keys = ON')
+        return conn
     
     def init_database(self):
         """Inicializa o banco de dados criando todas as tabelas necessárias"""
@@ -94,10 +97,25 @@ class Database:
                 preco_custo REAL DEFAULT 0,
                 estoque_atual REAL DEFAULT 0,
                 estoque_minimo REAL DEFAULT 0,
+                foto_path TEXT,
                 ativo INTEGER DEFAULT 1,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
         ''')
+        
+        # Verificar se coluna foto_path existe (para bancos antigos)
+        cursor.execute("PRAGMA table_info(produtos)")
+        columns = [column[1] for column in cursor.fetchall()]
+        if 'foto_path' not in columns:
+            try:
+                cursor.execute('ALTER TABLE produtos ADD COLUMN foto_path TEXT')
+            except:
+                pass  # Coluna pode já existir
+        
+        # Criar pasta para fotos se não existir
+        fotos_dir = os.path.join('data', 'fotos_produtos')
+        if not os.path.exists(fotos_dir):
+            os.makedirs(fotos_dir)
         
         # Tabela de orçamentos
         cursor.execute('''
@@ -181,6 +199,24 @@ class Database:
             )
         ''')
         
+        # Tabela de caixa (abertura e fechamento)
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS caixa (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                usuario_id INTEGER NOT NULL,
+                data_abertura TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                data_fechamento TIMESTAMP,
+                valor_inicial REAL DEFAULT 0,
+                valor_final REAL DEFAULT 0,
+                total_vendas REAL DEFAULT 0,
+                total_cancelamentos REAL DEFAULT 0,
+                total_descontos REAL DEFAULT 0,
+                observacoes TEXT,
+                status TEXT DEFAULT 'Aberto' CHECK(status IN ('Aberto', 'Fechado')),
+                FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+            )
+        ''')
+        
         # Criar usuário admin padrão se não existir
         cursor.execute('SELECT COUNT(*) FROM usuarios')
         if cursor.fetchone()[0] == 0:
@@ -210,24 +246,40 @@ class Database:
     
     def execute_query(self, query, params=None):
         """Executa uma query e retorna o resultado"""
-        conn = self.get_connection()
-        cursor = conn.cursor()
-        if params:
-            cursor.execute(query, params)
-        else:
-            cursor.execute(query)
-        result = cursor.fetchall()
-        conn.commit()
-        conn.close()
-        return result
+        conn = None
+        try:
+            conn = self.get_connection()
+            cursor = conn.cursor()
+            if params:
+                cursor.execute(query, params)
+            else:
+                cursor.execute(query)
+            result = cursor.fetchall()
+            conn.commit()  # Garantir commit antes de fechar
+            return result
+        except Exception as e:
+            if conn:
+                conn.rollback()  # Reverter em caso de erro
+            raise e
+        finally:
+            if conn:
+                conn.close()
     
     def execute_insert(self, query, params):
         """Executa um INSERT e retorna o ID do registro inserido"""
-        conn = self.get_connection()
-        cursor = conn.cursor()
-        cursor.execute(query, params)
-        last_id = cursor.lastrowid
-        conn.commit()
-        conn.close()
-        return last_id
+        conn = None
+        try:
+            conn = self.get_connection()
+            cursor = conn.cursor()
+            cursor.execute(query, params)
+            last_id = cursor.lastrowid
+            conn.commit()  # Garantir commit antes de fechar
+            return last_id
+        except Exception as e:
+            if conn:
+                conn.rollback()  # Reverter em caso de erro
+            raise e
+        finally:
+            if conn:
+                conn.close()
 

@@ -64,14 +64,19 @@ class MainWindow:
         # Menu Cadastros
         menu_cadastros = tk.Menu(menubar, tearoff=0)
         menubar.add_cascade(label="Cadastros", menu=menu_cadastros)
-        menu_cadastros.add_command(label="Clientes", command=self.abrir_cadastros)
-        menu_cadastros.add_command(label="Produtos", command=self.abrir_cadastros)
+        menu_cadastros.add_command(label="Clientes", command=self.abrir_clientes)
+        menu_cadastros.add_command(label="Produtos", command=self.abrir_produtos)
         
         # Menu Estoque
         menu_estoque = tk.Menu(menubar, tearoff=0)
         menubar.add_cascade(label="Estoque", menu=menu_estoque)
         menu_estoque.add_command(label="Consultar Estoque", command=self.abrir_estoque)
         menu_estoque.add_command(label="Movimentações", command=self.movimentacoes_estoque)
+        
+        # Menu Caixa
+        menu_caixa = tk.Menu(menubar, tearoff=0)
+        menubar.add_cascade(label="Caixa", menu=menu_caixa)
+        menu_caixa.add_command(label="Fechamento de Caixa", command=self.abrir_caixa)
         
         # Menu Configurações
         menu_config = tk.Menu(menubar, tearoff=0)
@@ -128,11 +133,18 @@ class MainWindow:
                                  command=self.abrir_orcamentos, **btn_style)
         btn_orcamento.pack(side=tk.LEFT, padx=(0, 8))
         
+        btn_clientes = tk.Button(toolbar_inner, text="👥 Clientes",
+                                bg="#2196F3", fg="white",
+                                activebackground="#1976D2",
+                                activeforeground="white",
+                                command=self.abrir_clientes, **btn_style)
+        btn_clientes.pack(side=tk.LEFT, padx=(0, 8))
+        
         btn_produtos = tk.Button(toolbar_inner, text="📦 Produtos",
                                 bg="#FF9800", fg="white",
                                 activebackground="#F57C00",
                                 activeforeground="white",
-                                command=self.abrir_cadastros, **btn_style)
+                                command=self.abrir_produtos, **btn_style)
         btn_produtos.pack(side=tk.LEFT, padx=(0, 8))
         
         btn_estoque = tk.Button(toolbar_inner, text="📊 Estoque",
@@ -141,6 +153,13 @@ class MainWindow:
                                activeforeground="white",
                                command=self.abrir_estoque, **btn_style)
         btn_estoque.pack(side=tk.LEFT, padx=(0, 8))
+        
+        btn_caixa = tk.Button(toolbar_inner, text="💰 Caixa",
+                             bg="#4CAF50", fg="white",
+                             activebackground="#45a049",
+                             activeforeground="white",
+                             command=self.abrir_caixa, **btn_style)
+        btn_caixa.pack(side=tk.LEFT, padx=(0, 8))
         
         # Botão Dashboard
         btn_dashboard = tk.Button(toolbar_inner, text="🏠 Dashboard",
@@ -230,15 +249,25 @@ class MainWindow:
                                    "Criar novo orçamento", "#2196F3",
                                    self.abrir_orcamentos, 0, 1)
         
+        # Card Clientes
+        self.create_dashboard_card(actions_frame, "👥", "Clientes", 
+                                   "Gerenciar clientes", "#2196F3",
+                                   self.abrir_clientes, 1, 0)
+        
         # Card Produtos
         self.create_dashboard_card(actions_frame, "📦", "Produtos", 
                                    "Gerenciar produtos", "#FF9800",
-                                   self.abrir_cadastros, 1, 0)
+                                   self.abrir_produtos, 1, 1)
         
         # Card Estoque
         self.create_dashboard_card(actions_frame, "📊", "Estoque", 
                                    "Consultar estoque", "#9C27B0",
-                                   self.abrir_estoque, 1, 1)
+                                   self.abrir_estoque, 2, 0)
+        
+        # Card Caixa
+        self.create_dashboard_card(actions_frame, "💰", "Caixa", 
+                                   "Fechamento de caixa", "#4CAF50",
+                                   self.abrir_caixa, 2, 1)
         
         # Botão voltar (se não estiver no dashboard)
         btn_voltar_frame = tk.Frame(dashboard_frame, bg=self.bg_color)
@@ -305,12 +334,19 @@ class MainWindow:
         self.current_screen = OrcamentosPanel(self.content_frame, self.auth)
         self.update_status("Tela de Orçamentos")
     
-    def abrir_cadastros(self):
-        """Abre a tela de cadastros dentro da janela principal"""
-        from ui_cadastros_panel import CadastrosPanel
+    def abrir_clientes(self):
+        """Abre a tela de clientes dentro da janela principal"""
+        from ui_clientes_panel import ClientesPanel
         self.clear_content()
-        self.current_screen = CadastrosPanel(self.content_frame, self.auth)
-        self.update_status("Tela de Cadastros")
+        self.current_screen = ClientesPanel(self.content_frame, self.auth)
+        self.update_status("Tela de Clientes")
+    
+    def abrir_produtos(self):
+        """Abre a tela de produtos dentro da janela principal"""
+        from ui_produtos_panel import ProdutosPanel
+        self.clear_content()
+        self.current_screen = ProdutosPanel(self.content_frame, self.auth)
+        self.update_status("Tela de Produtos")
     
     def abrir_estoque(self):
         """Abre a tela de estoque dentro da janela principal"""
@@ -318,6 +354,13 @@ class MainWindow:
         self.clear_content()
         self.current_screen = EstoquePanel(self.content_frame, self.auth)
         self.update_status("Tela de Estoque")
+    
+    def abrir_caixa(self):
+        """Abre a tela de fechamento de caixa dentro da janela principal"""
+        from ui_caixa_panel import CaixaPanel
+        self.clear_content()
+        self.current_screen = CaixaPanel(self.content_frame, self.auth)
+        self.update_status("Fechamento de Caixa")
     
     def update_status(self, message):
         """Atualiza a barra de status"""
@@ -363,13 +406,10 @@ class MainWindow:
     def on_closing(self):
         """Handler para fechamento da janela principal"""
         if messagebox.askokcancel("Sair", "Deseja realmente fechar o sistema?"):
-            # Fazer backup antes de fechar
+            # Fazer backup antes de fechar (sem usar widgets do Tkinter)
             try:
                 from backup import fazer_backup_banco
-                if fazer_backup_banco():
-                    self.update_status("Backup criado com sucesso!")
-                else:
-                    self.update_status("Aviso: Não foi possível criar o backup")
+                fazer_backup_banco()
             except Exception as e:
                 print(f"Erro ao criar backup: {str(e)}")
             

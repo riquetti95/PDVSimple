@@ -9,63 +9,141 @@ class Produtos:
     
     def create(self, dados):
         """Cria um novo produto"""
-        return self.db.execute_insert('''
-            INSERT INTO produtos (
-                codigo, descricao, categoria, unidade, preco_venda,
-                preco_custo, estoque_atual, estoque_minimo, ativo
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ''', (
-            dados.get('codigo', ''),
-            dados.get('descricao', ''),
-            dados.get('categoria', ''),
-            dados.get('unidade', 'UN'),
-            dados.get('preco_venda', 0),
-            dados.get('preco_custo', 0),
-            dados.get('estoque_atual', 0),
-            dados.get('estoque_minimo', 0),
-            dados.get('ativo', 1)
-        ))
+        # Validações
+        if not dados.get('descricao', '').strip():
+            raise ValueError("A descrição do produto é obrigatória!")
+        
+        preco_venda = dados.get('preco_venda', 0)
+        if preco_venda < 0:
+            raise ValueError("O preço de venda não pode ser negativo!")
+        
+        estoque_atual = dados.get('estoque_atual', 0)
+        if estoque_atual < 0:
+            raise ValueError("O estoque atual não pode ser negativo!")
+        
+        estoque_minimo = dados.get('estoque_minimo', 0)
+        if estoque_minimo < 0:
+            raise ValueError("O estoque mínimo não pode ser negativo!")
+        
+        # Verificar se código já existe (se informado)
+        codigo = dados.get('codigo', '').strip()
+        if codigo:
+            existing = self.db.execute_query('SELECT id FROM produtos WHERE codigo = ?', (codigo,))
+            if existing:
+                raise ValueError(f"Já existe um produto com o código {codigo}!")
+        
+        try:
+            return self.db.execute_insert('''
+                INSERT INTO produtos (
+                    codigo, descricao, categoria, unidade, preco_venda,
+                    preco_custo, estoque_atual, estoque_minimo, foto_path, ativo
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (
+                codigo,
+                dados.get('descricao', '').strip(),
+                dados.get('categoria', '').strip(),
+                dados.get('unidade', 'UN').strip(),
+                preco_venda,
+                dados.get('preco_custo', 0),
+                estoque_atual,
+                estoque_minimo,
+                dados.get('foto_path', ''),
+                dados.get('ativo', 1)
+            ))
+        except Exception as e:
+            raise Exception(f"Erro ao criar produto: {str(e)}")
     
     def update(self, produto_id, dados):
         """Atualiza um produto"""
-        self.db.execute_query('''
-            UPDATE produtos SET
-                codigo = ?,
-                descricao = ?,
-                categoria = ?,
-                unidade = ?,
-                preco_venda = ?,
-                preco_custo = ?,
-                estoque_minimo = ?,
-                ativo = ?
-            WHERE id = ?
-        ''', (
-            dados.get('codigo', ''),
-            dados.get('descricao', ''),
-            dados.get('categoria', ''),
-            dados.get('unidade', 'UN'),
-            dados.get('preco_venda', 0),
-            dados.get('preco_custo', 0),
-            dados.get('estoque_minimo', 0),
-            dados.get('ativo', 1),
-            produto_id
-        ))
+        # Validações
+        if not produto_id:
+            raise ValueError("ID do produto não informado!")
+        
+        # Verificar se produto existe
+        produto = self.get_by_id(produto_id)
+        if not produto:
+            raise ValueError("Produto não encontrado!")
+        
+        if not dados.get('descricao', '').strip():
+            raise ValueError("A descrição do produto é obrigatória!")
+        
+        preco_venda = dados.get('preco_venda', 0)
+        if preco_venda < 0:
+            raise ValueError("O preço de venda não pode ser negativo!")
+        
+        estoque_minimo = dados.get('estoque_minimo', 0)
+        if estoque_minimo < 0:
+            raise ValueError("O estoque mínimo não pode ser negativo!")
+        
+        # Verificar se código já existe em outro produto (se informado)
+        codigo = dados.get('codigo', '').strip()
+        if codigo:
+            existing = self.db.execute_query('SELECT id FROM produtos WHERE codigo = ? AND id != ?', (codigo, produto_id))
+            if existing:
+                raise ValueError(f"Já existe outro produto com o código {codigo}!")
+        
+        try:
+            self.db.execute_query('''
+                UPDATE produtos SET
+                    codigo = ?,
+                    descricao = ?,
+                    categoria = ?,
+                    unidade = ?,
+                    preco_venda = ?,
+                    preco_custo = ?,
+                    estoque_minimo = ?,
+                    foto_path = ?,
+                    ativo = ?
+                WHERE id = ?
+            ''', (
+                codigo,
+                dados.get('descricao', '').strip(),
+                dados.get('categoria', '').strip(),
+                dados.get('unidade', 'UN').strip(),
+                preco_venda,
+                dados.get('preco_custo', 0),
+                estoque_minimo,
+                dados.get('foto_path', ''),
+                dados.get('ativo', 1),
+                produto_id
+            ))
+        except Exception as e:
+            raise Exception(f"Erro ao atualizar produto: {str(e)}")
     
     def get_by_id(self, produto_id):
         """Busca produto por ID"""
         result = self.db.execute_query('SELECT * FROM produtos WHERE id = ?', (produto_id,))
         if result:
+            row = result[0]
+            # Ordem das colunas: id, codigo, descricao, categoria, unidade, 
+            # preco_venda, preco_custo, estoque_atual, estoque_minimo, 
+            # ativo, created_at, foto_path
+            # Verificar quantas colunas existem
+            if len(row) >= 12:
+                # Banco com foto_path (posição 11)
+                foto_path = row[11] if row[11] else ''
+                ativo = row[9]
+            elif len(row) >= 11:
+                # Banco sem foto_path mas com created_at
+                foto_path = ''
+                ativo = row[9]
+            else:
+                # Banco antigo
+                foto_path = ''
+                ativo = row[9] if len(row) > 9 else 1
+            
             return {
-                'id': result[0][0],
-                'codigo': result[0][1],
-                'descricao': result[0][2],
-                'categoria': result[0][3],
-                'unidade': result[0][4],
-                'preco_venda': result[0][5],
-                'preco_custo': result[0][6],
-                'estoque_atual': result[0][7],
-                'estoque_minimo': result[0][8],
-                'ativo': result[0][9]
+                'id': row[0],
+                'codigo': row[1],
+                'descricao': row[2],
+                'categoria': row[3],
+                'unidade': row[4],
+                'preco_venda': row[5],
+                'preco_custo': row[6],
+                'estoque_atual': row[7],
+                'estoque_minimo': row[8],
+                'ativo': ativo,
+                'foto_path': foto_path
             }
         return None
     
@@ -73,51 +151,99 @@ class Produtos:
         """Busca produto por código"""
         result = self.db.execute_query('SELECT * FROM produtos WHERE codigo = ? AND ativo = 1', (codigo,))
         if result:
+            row = result[0]
+            # Ordem das colunas: id, codigo, descricao, categoria, unidade, 
+            # preco_venda, preco_custo, estoque_atual, estoque_minimo, 
+            # ativo, created_at, foto_path
+            if len(row) >= 12:
+                foto_path = row[11] if row[11] else ''
+                ativo = row[9]
+            elif len(row) >= 11:
+                foto_path = ''
+                ativo = row[9]
+            else:
+                foto_path = ''
+                ativo = row[9] if len(row) > 9 else 1
+            
             return {
-                'id': result[0][0],
-                'codigo': result[0][1],
-                'descricao': result[0][2],
-                'categoria': result[0][3],
-                'unidade': result[0][4],
-                'preco_venda': result[0][5],
-                'preco_custo': result[0][6],
-                'estoque_atual': result[0][7],
-                'estoque_minimo': result[0][8],
-                'ativo': result[0][9]
+                'id': row[0],
+                'codigo': row[1],
+                'descricao': row[2],
+                'categoria': row[3],
+                'unidade': row[4],
+                'preco_venda': row[5],
+                'preco_custo': row[6],
+                'estoque_atual': row[7],
+                'estoque_minimo': row[8],
+                'ativo': ativo,
+                'foto_path': foto_path
             }
         return None
     
-    def list_all(self, search='', apenas_ativos=True):
+    def list_all(self, search='', apenas_ativos=True, incluir_estoque_minimo=False):
         """Lista todos os produtos com busca opcional"""
-        if apenas_ativos:
-            if search:
-                return self.db.execute_query('''
-                    SELECT id, codigo, descricao, categoria, preco_venda, estoque_atual, unidade
-                    FROM produtos
-                    WHERE ativo = 1 AND (codigo LIKE ? OR descricao LIKE ?)
-                    ORDER BY descricao
-                ''', (f'%{search}%', f'%{search}%'))
+        if incluir_estoque_minimo:
+            # Para estoque, incluir estoque_minimo
+            if apenas_ativos:
+                if search:
+                    return self.db.execute_query('''
+                        SELECT id, codigo, descricao, categoria, preco_venda, estoque_atual, estoque_minimo, unidade
+                        FROM produtos
+                        WHERE ativo = 1 AND (codigo LIKE ? OR descricao LIKE ?)
+                        ORDER BY descricao
+                    ''', (f'%{search}%', f'%{search}%'))
+                else:
+                    return self.db.execute_query('''
+                        SELECT id, codigo, descricao, categoria, preco_venda, estoque_atual, estoque_minimo, unidade
+                        FROM produtos
+                        WHERE ativo = 1
+                        ORDER BY descricao
+                    ''')
             else:
-                return self.db.execute_query('''
-                    SELECT id, codigo, descricao, categoria, preco_venda, estoque_atual, unidade
-                    FROM produtos
-                    WHERE ativo = 1
-                    ORDER BY descricao
-                ''')
+                if search:
+                    return self.db.execute_query('''
+                        SELECT id, codigo, descricao, categoria, preco_venda, estoque_atual, estoque_minimo, unidade, ativo
+                        FROM produtos
+                        WHERE codigo LIKE ? OR descricao LIKE ?
+                        ORDER BY descricao
+                    ''', (f'%{search}%', f'%{search}%'))
+                else:
+                    return self.db.execute_query('''
+                        SELECT id, codigo, descricao, categoria, preco_venda, estoque_atual, estoque_minimo, unidade, ativo
+                        FROM produtos
+                        ORDER BY descricao
+                    ''')
         else:
-            if search:
-                return self.db.execute_query('''
-                    SELECT id, codigo, descricao, categoria, preco_venda, estoque_atual, unidade, ativo
-                    FROM produtos
-                    WHERE codigo LIKE ? OR descricao LIKE ?
-                    ORDER BY descricao
-                ''', (f'%{search}%', f'%{search}%'))
+            # Versão padrão sem estoque_minimo
+            if apenas_ativos:
+                if search:
+                    return self.db.execute_query('''
+                        SELECT id, codigo, descricao, categoria, preco_venda, estoque_atual, unidade
+                        FROM produtos
+                        WHERE ativo = 1 AND (codigo LIKE ? OR descricao LIKE ?)
+                        ORDER BY descricao
+                    ''', (f'%{search}%', f'%{search}%'))
+                else:
+                    return self.db.execute_query('''
+                        SELECT id, codigo, descricao, categoria, preco_venda, estoque_atual, unidade
+                        FROM produtos
+                        WHERE ativo = 1
+                        ORDER BY descricao
+                    ''')
             else:
-                return self.db.execute_query('''
-                    SELECT id, codigo, descricao, categoria, preco_venda, estoque_atual, unidade, ativo
-                    FROM produtos
-                    ORDER BY descricao
-                ''')
+                if search:
+                    return self.db.execute_query('''
+                        SELECT id, codigo, descricao, categoria, preco_venda, estoque_atual, unidade, ativo
+                        FROM produtos
+                        WHERE codigo LIKE ? OR descricao LIKE ?
+                        ORDER BY descricao
+                    ''', (f'%{search}%', f'%{search}%'))
+                else:
+                    return self.db.execute_query('''
+                        SELECT id, codigo, descricao, categoria, preco_venda, estoque_atual, unidade, ativo
+                        FROM produtos
+                        ORDER BY descricao
+                    ''')
     
     def atualizar_estoque(self, produto_id, quantidade, tipo='Ajuste'):
         """Atualiza o estoque de um produto"""

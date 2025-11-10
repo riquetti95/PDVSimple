@@ -88,12 +88,17 @@ class DetalhesVendaWindow:
     def cancelar_venda(self):
         """Cancela a venda"""
         if messagebox.askyesno("Confirmar", "Deseja realmente cancelar esta venda?\nO estoque será revertido."):
-            usuario_id = self.auth.get_current_user()['id']
-            if self.vendas.cancelar(self.venda['id'], usuario_id):
-                messagebox.showinfo("Sucesso", "Venda cancelada com sucesso!")
-                self.window.destroy()
-            else:
-                messagebox.showerror("Erro", "Erro ao cancelar venda!")
+            try:
+                usuario_id = self.auth.get_current_user()['id']
+                if self.vendas.cancelar(self.venda['id'], usuario_id):
+                    messagebox.showinfo("Sucesso", "Venda cancelada com sucesso!")
+                    self.window.destroy()
+                else:
+                    messagebox.showerror("Erro", "Erro ao cancelar venda!")
+            except ValueError as e:
+                messagebox.showerror("Erro de Validação", str(e))
+            except Exception as e:
+                messagebox.showerror("Erro", f"Erro ao cancelar venda: {str(e)}")
     
     def ver_cupom(self):
         """Visualiza cupom"""

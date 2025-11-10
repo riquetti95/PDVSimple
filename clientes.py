@@ -9,58 +9,98 @@ class Clientes:
     
     def create(self, dados):
         """Cria um novo cliente"""
-        return self.db.execute_insert('''
-            INSERT INTO clientes (
-                nome, cpf_cnpj, telefone, email, endereco, numero,
-                complemento, bairro, cidade, estado, cep, observacoes
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ''', (
-            dados.get('nome', ''),
-            dados.get('cpf_cnpj', ''),
-            dados.get('telefone', ''),
-            dados.get('email', ''),
-            dados.get('endereco', ''),
-            dados.get('numero', ''),
-            dados.get('complemento', ''),
-            dados.get('bairro', ''),
-            dados.get('cidade', ''),
-            dados.get('estado', ''),
-            dados.get('cep', ''),
-            dados.get('observacoes', '')
-        ))
+        # Validações
+        nome = dados.get('nome', '').strip()
+        if not nome:
+            raise ValueError("O nome do cliente é obrigatório!")
+        
+        if len(nome) < 3:
+            raise ValueError("O nome do cliente deve ter pelo menos 3 caracteres!")
+        
+        # Validar email se informado
+        email = dados.get('email', '').strip()
+        if email and '@' not in email:
+            raise ValueError("Email inválido!")
+        
+        try:
+            return self.db.execute_insert('''
+                INSERT INTO clientes (
+                    nome, cpf_cnpj, telefone, email, endereco, numero,
+                    complemento, bairro, cidade, estado, cep, observacoes
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (
+                nome,
+                dados.get('cpf_cnpj', '').strip(),
+                dados.get('telefone', '').strip(),
+                email,
+                dados.get('endereco', '').strip(),
+                dados.get('numero', '').strip(),
+                dados.get('complemento', '').strip(),
+                dados.get('bairro', '').strip(),
+                dados.get('cidade', '').strip(),
+                dados.get('estado', '').strip(),
+                dados.get('cep', '').strip(),
+                dados.get('observacoes', '').strip()
+            ))
+        except Exception as e:
+            raise Exception(f"Erro ao criar cliente: {str(e)}")
     
     def update(self, cliente_id, dados):
         """Atualiza um cliente"""
-        self.db.execute_query('''
-            UPDATE clientes SET
-                nome = ?,
-                cpf_cnpj = ?,
-                telefone = ?,
-                email = ?,
-                endereco = ?,
-                numero = ?,
-                complemento = ?,
-                bairro = ?,
-                cidade = ?,
-                estado = ?,
-                cep = ?,
-                observacoes = ?
-            WHERE id = ?
-        ''', (
-            dados.get('nome', ''),
-            dados.get('cpf_cnpj', ''),
-            dados.get('telefone', ''),
-            dados.get('email', ''),
-            dados.get('endereco', ''),
-            dados.get('numero', ''),
-            dados.get('complemento', ''),
-            dados.get('bairro', ''),
-            dados.get('cidade', ''),
-            dados.get('estado', ''),
-            dados.get('cep', ''),
-            dados.get('observacoes', ''),
-            cliente_id
-        ))
+        # Validações
+        if not cliente_id:
+            raise ValueError("ID do cliente não informado!")
+        
+        # Verificar se cliente existe
+        cliente = self.get_by_id(cliente_id)
+        if not cliente:
+            raise ValueError("Cliente não encontrado!")
+        
+        nome = dados.get('nome', '').strip()
+        if not nome:
+            raise ValueError("O nome do cliente é obrigatório!")
+        
+        if len(nome) < 3:
+            raise ValueError("O nome do cliente deve ter pelo menos 3 caracteres!")
+        
+        # Validar email se informado
+        email = dados.get('email', '').strip()
+        if email and '@' not in email:
+            raise ValueError("Email inválido!")
+        
+        try:
+            self.db.execute_query('''
+                UPDATE clientes SET
+                    nome = ?,
+                    cpf_cnpj = ?,
+                    telefone = ?,
+                    email = ?,
+                    endereco = ?,
+                    numero = ?,
+                    complemento = ?,
+                    bairro = ?,
+                    cidade = ?,
+                    estado = ?,
+                    cep = ?,
+                    observacoes = ?
+                WHERE id = ?
+            ''', (
+                nome,
+                dados.get('cpf_cnpj', '').strip(),
+                dados.get('telefone', '').strip(),
+                email,
+                dados.get('endereco', '').strip(),
+                dados.get('numero', '').strip(),
+                dados.get('complemento', '').strip(),
+                dados.get('bairro', '').strip(),
+                dados.get('cidade', '').strip(),
+                dados.get('estado', '').strip(),
+                dados.get('cep', '').strip(),
+                dados.get('observacoes', '').strip(),
+                cliente_id
+            ))
+        except Exception as e:
+            raise Exception(f"Erro ao atualizar cliente: {str(e)}")
     
     def get_by_id(self, cliente_id):
         """Busca cliente por ID"""

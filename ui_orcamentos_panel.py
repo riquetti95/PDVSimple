@@ -22,93 +22,137 @@ class OrcamentosPanel:
     
     def create_widgets(self):
         """Cria os widgets da tela"""
-        # Frame principal
-        main_frame = tk.Frame(self.parent, bg="#f5f5f5")
-        main_frame.pack(fill=tk.BOTH, expand=True, padx=15, pady=15)
+        # Frame principal com mesmo estilo da venda
+        main_frame = tk.Frame(self.parent, bg="#f0f4f8")
+        main_frame.pack(fill=tk.BOTH, expand=True, padx=0, pady=0)
         
-        # Título com botão voltar
-        title_frame = tk.Frame(main_frame, bg="#ffffff", relief=tk.FLAT, bd=0)
-        title_frame.pack(fill=tk.X, pady=(0, 15))
+        # Header moderno azul
+        header_frame = tk.Frame(main_frame, bg="#2196F3", height=80)
+        header_frame.pack(fill=tk.X, padx=0, pady=0)
+        header_frame.pack_propagate(False)
         
-        title_inner = tk.Frame(title_frame, bg="#ffffff")
-        title_inner.pack(fill=tk.X, padx=20, pady=15)
+        header_content = tk.Frame(header_frame, bg="#2196F3")
+        header_content.pack(fill=tk.BOTH, expand=True, padx=20, pady=15)
         
-        btn_voltar = tk.Button(title_inner, text="← Voltar",
-                              font=("Segoe UI", 10, "bold"),
+        # Botão voltar no header
+        btn_voltar = tk.Button(header_content, text="← Voltar",
+                              font=("Segoe UI", 11, "bold"),
                               bg="#1976D2", fg="white",
                               activebackground="#1565C0",
                               activeforeground="white",
                               relief=tk.FLAT, cursor="hand2",
-                              padx=15, pady=8,
+                              padx=20, pady=10,
                               command=self.voltar_dashboard)
-        btn_voltar.pack(side=tk.LEFT, padx=(0, 15))
+        btn_voltar.pack(side=tk.LEFT, padx=(0, 20))
         
-        title_label = tk.Label(title_inner, text="📋 Novo Orçamento",
-                              font=("Segoe UI", 20, "bold"),
-                              bg="#ffffff", fg="#333")
+        # Título com ícone
+        title_container = tk.Frame(header_content, bg="#2196F3")
+        title_container.pack(side=tk.LEFT)
+        
+        icon_label = tk.Label(title_container, text="📋", font=("Segoe UI", 28),
+                             bg="#2196F3", fg="white")
+        icon_label.pack(side=tk.LEFT, padx=(0, 12))
+        
+        title_label = tk.Label(title_container, text="Novo Orçamento",
+                              font=("Segoe UI", 24, "bold"),
+                              bg="#2196F3", fg="white")
         title_label.pack(side=tk.LEFT)
         
         # Container do conteúdo
-        content_frame = tk.Frame(main_frame, bg="#f5f5f5")
-        content_frame.pack(fill=tk.BOTH, expand=True)
+        content_frame = tk.Frame(main_frame, bg="#f0f4f8")
+        content_frame.pack(fill=tk.BOTH, expand=True, padx=15, pady=15)
         
         # Frame esquerdo
         left_frame = tk.Frame(content_frame, bg="#ffffff", relief=tk.FLAT, bd=0)
         left_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=(0, 10))
         
-        # Cliente
-        frame_cliente = tk.LabelFrame(left_frame, text="Cliente",
-                                     font=("Segoe UI", 11, "bold"),
-                                     bg="#ffffff", fg="#333",
-                                     relief=tk.FLAT, bd=1)
-        frame_cliente.pack(fill=tk.X, padx=15, pady=(15, 10))
+        # Card Cliente
+        card_cliente = tk.Frame(left_frame, bg="#ffffff", relief=tk.FLAT, bd=1,
+                               highlightbackground="#e0e0e0", highlightthickness=1)
+        card_cliente.pack(fill=tk.X, padx=15, pady=(0, 15))
         
-        self.cliente_label = tk.Label(frame_cliente, text="Nenhum cliente selecionado",
-                                     font=("Segoe UI", 10),
+        cliente_header = tk.Frame(card_cliente, bg="#f5f5f5", height=40)
+        cliente_header.pack(fill=tk.X)
+        cliente_header.pack_propagate(False)
+        
+        tk.Label(cliente_header, text="👤 Cliente", font=("Segoe UI", 12, "bold"),
+                bg="#f5f5f5", fg="#333").pack(side=tk.LEFT, padx=15, pady=10)
+        
+        cliente_body = tk.Frame(card_cliente, bg="#ffffff")
+        cliente_body.pack(fill=tk.X, padx=15, pady=15)
+        
+        self.cliente_label = tk.Label(cliente_body, text="Nenhum cliente selecionado",
+                                     font=("Segoe UI", 11),
                                      bg="#ffffff", fg="#757575")
-        self.cliente_label.pack(padx=10, pady=10)
+        self.cliente_label.pack(side=tk.LEFT, padx=(0, 10))
         
-        btn_selecionar_cliente = tk.Button(frame_cliente, text="Selecionar Cliente",
-                                          font=("Segoe UI", 9),
+        btn_selecionar_cliente = tk.Button(cliente_body, text="Selecionar Cliente",
+                                          font=("Segoe UI", 10, "bold"),
                                           bg="#2196F3", fg="white",
                                           relief=tk.FLAT, cursor="hand2",
+                                          padx=20, pady=8,
+                                          activebackground="#1976D2",
+                                          activeforeground="white",
                                           command=self.selecionar_cliente)
-        btn_selecionar_cliente.pack(pady=(0, 10))
+        btn_selecionar_cliente.pack(side=tk.LEFT)
         
-        # Busca de produtos
-        frame_busca = tk.LabelFrame(left_frame, text="Buscar Produto",
-                                    font=("Segoe UI", 11, "bold"),
-                                    bg="#ffffff", fg="#333",
-                                    relief=tk.FLAT, bd=1)
-        frame_busca.pack(fill=tk.X, padx=15, pady=(0, 10))
+        # Card Busca
+        card_busca = tk.Frame(left_frame, bg="#ffffff", relief=tk.FLAT, bd=1,
+                             highlightbackground="#e0e0e0", highlightthickness=1)
+        card_busca.pack(fill=tk.X, padx=15, pady=(0, 15))
         
-        self.search_entry = tk.Entry(frame_busca, font=("Segoe UI", 11),
+        busca_header = tk.Frame(card_busca, bg="#f5f5f5", height=40)
+        busca_header.pack(fill=tk.X)
+        busca_header.pack_propagate(False)
+        
+        tk.Label(busca_header, text="🔍 Buscar Produto", font=("Segoe UI", 12, "bold"),
+                bg="#f5f5f5", fg="#333").pack(side=tk.LEFT, padx=15, pady=10)
+        
+        busca_body = tk.Frame(card_busca, bg="#ffffff")
+        busca_body.pack(fill=tk.X, padx=15, pady=15)
+        
+        self.search_entry = tk.Entry(busca_body, font=("Segoe UI", 11),
                                      relief=tk.FLAT, bd=1, highlightthickness=1,
                                      highlightbackground="#e0e0e0",
                                      highlightcolor="#2196F3",
                                      bg="#fafafa")
-        self.search_entry.pack(fill=tk.X, padx=10, pady=10, ipady=8)
+        self.search_entry.pack(fill=tk.X, ipady=8)
         self.search_entry.bind('<KeyRelease>', lambda e: self.buscar_produto_auto())
         
-        # Lista de produtos
-        frame_produtos = tk.LabelFrame(left_frame, text="Produtos",
-                                      font=("Segoe UI", 11, "bold"),
-                                      bg="#ffffff", fg="#333",
-                                      relief=tk.FLAT, bd=1)
-        frame_produtos.pack(fill=tk.BOTH, expand=True, padx=15, pady=(0, 15))
+        # Card Produtos
+        card_produtos = tk.Frame(left_frame, bg="#ffffff", relief=tk.FLAT, bd=1,
+                                highlightbackground="#e0e0e0", highlightthickness=1)
+        card_produtos.pack(fill=tk.BOTH, expand=True, padx=15, pady=(0, 15))
+        
+        produtos_header = tk.Frame(card_produtos, bg="#f5f5f5", height=40)
+        produtos_header.pack(fill=tk.X)
+        produtos_header.pack_propagate(False)
+        
+        tk.Label(produtos_header, text="📦 Produtos Disponíveis", font=("Segoe UI", 12, "bold"),
+                bg="#f5f5f5", fg="#333").pack(side=tk.LEFT, padx=15, pady=10)
+        
+        produtos_body = tk.Frame(card_produtos, bg="#ffffff")
+        produtos_body.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
         
         columns = ('Código', 'Descrição', 'Preço', 'Estoque')
-        self.tree_produtos = ttk.Treeview(frame_produtos, columns=columns, show='headings', height=15)
+        self.tree_produtos = ttk.Treeview(produtos_body, columns=columns, show='headings', height=15)
+        
+        style = ttk.Style()
+        style.configure("Treeview", font=("Segoe UI", 10), rowheight=30)
+        style.configure("Treeview.Heading", font=("Segoe UI", 10, "bold"))
         
         for col in columns:
             self.tree_produtos.heading(col, text=col)
-            self.tree_produtos.column(col, width=100)
+            if col == 'Descrição':
+                self.tree_produtos.column(col, width=200)
+            else:
+                self.tree_produtos.column(col, width=100)
         
-        scrollbar = ttk.Scrollbar(frame_produtos, orient=tk.VERTICAL, command=self.tree_produtos.yview)
+        scrollbar = ttk.Scrollbar(produtos_body, orient=tk.VERTICAL, command=self.tree_produtos.yview)
         self.tree_produtos.configure(yscrollcommand=scrollbar.set)
         
-        self.tree_produtos.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=10, pady=10)
-        scrollbar.pack(side=tk.RIGHT, fill=tk.Y, pady=10)
+        self.tree_produtos.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         
         self.tree_produtos.bind('<Double-1>', lambda e: self.adicionar_produto())
         
@@ -116,44 +160,69 @@ class OrcamentosPanel:
         right_frame = tk.Frame(content_frame, bg="#ffffff", relief=tk.FLAT, bd=0)
         right_frame.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
         
-        # Carrinho
-        frame_carrinho = tk.LabelFrame(right_frame, text="Itens do Orçamento",
-                                      font=("Segoe UI", 11, "bold"),
-                                      bg="#ffffff", fg="#333",
-                                      relief=tk.FLAT, bd=1)
-        frame_carrinho.pack(fill=tk.BOTH, expand=True, padx=15, pady=(15, 10))
+        # Card Carrinho
+        card_carrinho = tk.Frame(right_frame, bg="#ffffff", relief=tk.FLAT, bd=1,
+                                highlightbackground="#e0e0e0", highlightthickness=1)
+        card_carrinho.pack(fill=tk.BOTH, expand=True, padx=15, pady=(0, 15))
+        
+        carrinho_header = tk.Frame(card_carrinho, bg="#FF9800", height=50)
+        carrinho_header.pack(fill=tk.X)
+        carrinho_header.pack_propagate(False)
+        
+        tk.Label(carrinho_header, text="🛒 Itens do Orçamento", font=("Segoe UI", 14, "bold"),
+                bg="#FF9800", fg="white").pack(side=tk.LEFT, padx=15, pady=12)
+        
+        carrinho_body = tk.Frame(card_carrinho, bg="#ffffff")
+        carrinho_body.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
         
         columns_carrinho = ('Produto', 'Qtd', 'Preço Unit.', 'Subtotal')
-        self.tree_carrinho = ttk.Treeview(frame_carrinho, columns=columns_carrinho, show='headings', height=15)
+        self.tree_carrinho = ttk.Treeview(carrinho_body, columns=columns_carrinho, show='headings', height=15)
         
         for col in columns_carrinho:
             self.tree_carrinho.heading(col, text=col)
-            self.tree_carrinho.column(col, width=120)
+            if col == 'Produto':
+                self.tree_carrinho.column(col, width=200)
+            else:
+                self.tree_carrinho.column(col, width=120)
         
-        scrollbar_carrinho = ttk.Scrollbar(frame_carrinho, orient=tk.VERTICAL, command=self.tree_carrinho.yview)
+        scrollbar_carrinho = ttk.Scrollbar(carrinho_body, orient=tk.VERTICAL, command=self.tree_carrinho.yview)
         self.tree_carrinho.configure(yscrollcommand=scrollbar_carrinho.set)
         
-        self.tree_carrinho.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=10, pady=10)
-        scrollbar_carrinho.pack(side=tk.RIGHT, fill=tk.Y, pady=10)
+        self.tree_carrinho.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        scrollbar_carrinho.pack(side=tk.RIGHT, fill=tk.Y)
         
-        # Validade
-        frame_validade = tk.LabelFrame(right_frame, text="Validade",
-                                      font=("Segoe UI", 11, "bold"),
-                                      bg="#ffffff", fg="#333",
-                                      relief=tk.FLAT, bd=1)
-        frame_validade.pack(fill=tk.X, padx=15, pady=(0, 10))
+        # Card Validade e Total
+        card_totais = tk.Frame(right_frame, bg="#ffffff", relief=tk.FLAT, bd=1,
+                               highlightbackground="#e0e0e0", highlightthickness=1)
+        card_totais.pack(fill=tk.X, padx=15, pady=(0, 15))
         
-        tk.Label(frame_validade, text="Dias de validade:", font=("Segoe UI", 10),
-                bg="#ffffff", fg="#333").pack(pady=10)
-        self.validade_entry = tk.Entry(frame_validade, font=("Segoe UI", 10), width=15)
+        totais_header = tk.Frame(card_totais, bg="#f5f5f5", height=40)
+        totais_header.pack(fill=tk.X)
+        totais_header.pack_propagate(False)
+        
+        tk.Label(totais_header, text="💰 Totais", font=("Segoe UI", 12, "bold"),
+                bg="#f5f5f5", fg="#333").pack(side=tk.LEFT, padx=15, pady=10)
+        
+        totais_body = tk.Frame(card_totais, bg="#ffffff")
+        totais_body.pack(fill=tk.X, padx=15, pady=15)
+        
+        tk.Label(totais_body, text="Dias de validade:", font=("Segoe UI", 11),
+                bg="#ffffff", fg="#333").pack(anchor=tk.W, pady=(0, 5))
+        self.validade_entry = tk.Entry(totais_body, font=("Segoe UI", 11), width=15)
         self.validade_entry.insert(0, "30")
-        self.validade_entry.pack(pady=5)
+        self.validade_entry.pack(anchor=tk.W, pady=(0, 15))
         
-        # Total
-        self.total_label = tk.Label(frame_validade, text="Total: R$ 0,00",
-                                   font=("Segoe UI", 16, "bold"),
-                                   bg="#ffffff", fg="#2196F3")
-        self.total_label.pack(pady=10)
+        # Total destacado
+        total_frame = tk.Frame(totais_body, bg="#4CAF50", relief=tk.FLAT)
+        total_frame.pack(fill=tk.X, pady=(0, 0))
+        
+        tk.Label(total_frame, text="TOTAL", font=("Segoe UI", 11, "bold"),
+                bg="#4CAF50", fg="white").pack(anchor=tk.W, padx=15, pady=(10, 5))
+        
+        self.total_label = tk.Label(total_frame, text="R$ 0,00",
+                                   font=("Segoe UI", 24, "bold"),
+                                   bg="#4CAF50", fg="white")
+        self.total_label.pack(padx=15, pady=(0, 15))
         
         # Botões
         frame_buttons = tk.Frame(right_frame, bg="#ffffff")

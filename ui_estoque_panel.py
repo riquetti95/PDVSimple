@@ -23,68 +23,96 @@ class EstoquePanel:
     
     def create_widgets(self):
         """Cria os widgets"""
-        # Frame principal
-        main_frame = tk.Frame(self.parent, bg="#f5f5f5")
-        main_frame.pack(fill=tk.BOTH, expand=True, padx=15, pady=15)
+        # Frame principal com mesmo estilo da venda
+        main_frame = tk.Frame(self.parent, bg="#f0f4f8")
+        main_frame.pack(fill=tk.BOTH, expand=True, padx=0, pady=0)
         
-        # Título com botão voltar
-        title_frame = tk.Frame(main_frame, bg="#ffffff", relief=tk.FLAT, bd=0)
-        title_frame.pack(fill=tk.X, pady=(0, 15))
+        # Header moderno roxo
+        header_frame = tk.Frame(main_frame, bg="#9C27B0", height=80)
+        header_frame.pack(fill=tk.X, padx=0, pady=0)
+        header_frame.pack_propagate(False)
         
-        title_inner = tk.Frame(title_frame, bg="#ffffff")
-        title_inner.pack(fill=tk.X, padx=20, pady=15)
+        header_content = tk.Frame(header_frame, bg="#9C27B0")
+        header_content.pack(fill=tk.BOTH, expand=True, padx=20, pady=15)
         
-        btn_voltar = tk.Button(title_inner, text="← Voltar",
-                              font=("Segoe UI", 10, "bold"),
-                              bg="#1976D2", fg="white",
-                              activebackground="#1565C0",
+        # Botão voltar no header
+        btn_voltar = tk.Button(header_content, text="← Voltar",
+                              font=("Segoe UI", 11, "bold"),
+                              bg="#7B1FA2", fg="white",
+                              activebackground="#6A1B9A",
                               activeforeground="white",
                               relief=tk.FLAT, cursor="hand2",
-                              padx=15, pady=8,
+                              padx=20, pady=10,
                               command=self.voltar_dashboard)
-        btn_voltar.pack(side=tk.LEFT, padx=(0, 15))
+        btn_voltar.pack(side=tk.LEFT, padx=(0, 20))
         
-        title_label = tk.Label(title_inner, text="📊 Controle de Estoque",
-                              font=("Segoe UI", 20, "bold"),
-                              bg="#ffffff", fg="#333")
+        # Título com ícone
+        title_container = tk.Frame(header_content, bg="#9C27B0")
+        title_container.pack(side=tk.LEFT)
+        
+        icon_label = tk.Label(title_container, text="📊", font=("Segoe UI", 28),
+                             bg="#9C27B0", fg="white")
+        icon_label.pack(side=tk.LEFT, padx=(0, 12))
+        
+        title_label = tk.Label(title_container, text="Controle de Estoque",
+                              font=("Segoe UI", 24, "bold"),
+                              bg="#9C27B0", fg="white")
         title_label.pack(side=tk.LEFT)
         
-        # Frame de busca
-        frame_busca = tk.Frame(main_frame, bg="#ffffff", relief=tk.FLAT, bd=0)
-        frame_busca.pack(fill=tk.X, padx=15, pady=(0, 15))
+        # Container do conteúdo
+        content_frame = tk.Frame(main_frame, bg="#f0f4f8")
+        content_frame.pack(fill=tk.BOTH, expand=True, padx=15, pady=15)
         
-        busca_inner = tk.Frame(frame_busca, bg="#ffffff")
-        busca_inner.pack(fill=tk.X, padx=15, pady=15)
+        # Card de busca
+        card_busca = tk.Frame(content_frame, bg="#ffffff", relief=tk.FLAT, bd=1,
+                             highlightbackground="#e0e0e0", highlightthickness=1)
+        card_busca.pack(fill=tk.X, pady=(0, 15))
         
-        tk.Label(busca_inner, text="Buscar:", font=("Segoe UI", 10)).pack(side=tk.LEFT, padx=5)
-        self.search_entry = tk.Entry(busca_inner, font=("Segoe UI", 10), width=30,
-                                    relief=tk.FLAT, bd=1, highlightthickness=1,
-                                    highlightbackground="#e0e0e0",
-                                    highlightcolor="#2196F3",
-                                    bg="#fafafa")
-        self.search_entry.pack(side=tk.LEFT, padx=5)
+        busca_inner = tk.Frame(card_busca, bg="#ffffff")
+        busca_inner.pack(fill=tk.X, padx=20, pady=15)
+        
+        tk.Label(busca_inner, text="🔍 Buscar:", font=("Segoe UI", 11, "bold"),
+                bg="#ffffff", fg="#333").pack(side=tk.LEFT, padx=(0, 10))
+        
+        self.search_entry = tk.Entry(busca_inner, font=("Segoe UI", 11),
+                                     relief=tk.FLAT, bd=1, highlightthickness=1,
+                                     highlightbackground="#e0e0e0",
+                                     highlightcolor="#9C27B0",
+                                     bg="#fafafa")
+        self.search_entry.pack(side=tk.LEFT, fill=tk.X, expand=True, padx=(0, 10), ipady=8)
         self.search_entry.bind('<KeyRelease>', lambda e: self.load_produtos())
         
-        btn_ajustar = tk.Button(busca_inner, text="Ajustar Estoque",
+        btn_ajustar = tk.Button(busca_inner, text="⚙️ Ajustar Estoque",
                                bg="#4CAF50", fg="white",
-                               font=("Segoe UI", 10),
+                               font=("Segoe UI", 11, "bold"),
                                relief=tk.FLAT, cursor="hand2",
+                               padx=20, pady=10,
+                               activebackground="#45a049",
+                               activeforeground="white",
                                command=self.ajustar_estoque)
-        btn_ajustar.pack(side=tk.RIGHT, padx=5)
+        btn_ajustar.pack(side=tk.RIGHT)
         
-        # Treeview
-        frame_tree = tk.Frame(main_frame, bg="#ffffff", relief=tk.FLAT, bd=0)
-        frame_tree.pack(fill=tk.BOTH, expand=True, padx=15, pady=(0, 15))
+        # Card da tabela
+        card_tabela = tk.Frame(content_frame, bg="#ffffff", relief=tk.FLAT, bd=1,
+                              highlightbackground="#e0e0e0", highlightthickness=1)
+        card_tabela.pack(fill=tk.BOTH, expand=True)
         
-        tree_inner = tk.Frame(frame_tree, bg="#ffffff")
-        tree_inner.pack(fill=tk.BOTH, expand=True, padx=15, pady=15)
+        tree_inner = tk.Frame(card_tabela, bg="#ffffff")
+        tree_inner.pack(fill=tk.BOTH, expand=True, padx=20, pady=20)
         
         columns = ('ID', 'Código', 'Descrição', 'Estoque Atual', 'Estoque Mínimo', 'Status')
         self.tree = ttk.Treeview(tree_inner, columns=columns, show='headings', height=20)
         
+        style = ttk.Style()
+        style.configure("Treeview", font=("Segoe UI", 10), rowheight=30)
+        style.configure("Treeview.Heading", font=("Segoe UI", 10, "bold"))
+        
         for col in columns:
             self.tree.heading(col, text=col)
-            self.tree.column(col, width=150)
+            if col == 'Descrição':
+                self.tree.column(col, width=250)
+            else:
+                self.tree.column(col, width=150)
         
         scrollbar = ttk.Scrollbar(tree_inner, orient=tk.VERTICAL, command=self.tree.yview)
         self.tree.configure(yscrollcommand=scrollbar.set)
@@ -98,12 +126,14 @@ class EstoquePanel:
             self.tree.delete(item)
         
         search = self.search_entry.get()
-        produtos = self.produtos.list_all(search)
+        # Usar incluir_estoque_minimo=True para obter estoque_minimo
+        produtos = self.produtos.list_all(search, apenas_ativos=False, incluir_estoque_minimo=True)
         
         for produto in produtos:
+            # Estrutura: id, codigo, descricao, categoria, preco_venda, estoque_atual, estoque_minimo, unidade
             estoque = produto[5]
             minimo = produto[6] if len(produto) > 6 else 0
-            status = "OK" if estoque > minimo else "BAIXO"
+            status = "OK" if estoque >= minimo else "BAIXO"
             
             self.tree.insert('', tk.END, values=(
                 produto[0], produto[1], produto[2], estoque, minimo, status

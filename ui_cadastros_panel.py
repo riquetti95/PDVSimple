@@ -73,11 +73,15 @@ class CadastrosPanel:
         self.search_cliente.pack(side=tk.LEFT, padx=5)
         self.search_cliente.bind('<KeyRelease>', lambda e: self.load_clientes())
         
+        def abrir_novo_cliente():
+            """Wrapper para garantir que o método correto seja chamado"""
+            self.novo_cliente()
+        
         btn_novo_cliente = tk.Button(frame_busca, text="Novo Cliente",
                                     bg="#4CAF50", fg="white",
                                     font=("Segoe UI", 10),
                                     relief=tk.FLAT, cursor="hand2",
-                                    command=self.novo_cliente)
+                                    command=abrir_novo_cliente)
         btn_novo_cliente.pack(side=tk.RIGHT, padx=5)
         
         # Treeview de clientes
@@ -114,11 +118,15 @@ class CadastrosPanel:
         self.search_produto.pack(side=tk.LEFT, padx=5)
         self.search_produto.bind('<KeyRelease>', lambda e: self.load_produtos())
         
+        def abrir_novo_produto():
+            """Wrapper para garantir que o método correto seja chamado"""
+            self.novo_produto()
+        
         btn_novo_produto = tk.Button(frame_busca, text="Novo Produto",
                                     bg="#4CAF50", fg="white",
                                     font=("Segoe UI", 10),
                                     relief=tk.FLAT, cursor="hand2",
-                                    command=self.novo_produto)
+                                    command=abrir_novo_produto)
         btn_novo_produto.pack(side=tk.RIGHT, padx=5)
         
         # Treeview de produtos
@@ -192,9 +200,38 @@ class CadastrosPanel:
     
     def novo_produto(self):
         """Abre formulário de novo produto"""
-        from ui_form_produto import FormProdutoWindow
-        root_window = self.parent.winfo_toplevel()
-        FormProdutoWindow(root_window, self.produtos, callback=self.load_produtos)
+        try:
+            # Garantir que estamos usando o módulo correto
+            import ui_form_produto
+            FormProdutoWindow = ui_form_produto.FormProdutoWindow
+            
+            root_window = self.parent.winfo_toplevel()
+            
+            # Verificar se produtos está inicializado
+            if not hasattr(self, 'produtos') or self.produtos is None:
+                self.produtos = Produtos()
+            
+            # Criar instância do formulário de PRODUTO (não cliente!)
+            form = FormProdutoWindow(root_window, self.produtos, callback=self.load_produtos)
+            
+            # Verificar se foi criado corretamente
+            if not form or not hasattr(form, 'window'):
+                raise Exception("Falha ao criar formulário de produto")
+                
+            # Verificar se o título da janela está correto
+            if hasattr(form, 'window') and form.window:
+                title = form.window.title()
+                if "Cliente" in title or "cliente" in title.lower():
+                    raise Exception(f"ERRO: Formulário de cliente foi aberto ao invés de produto! Título: {title}")
+                    
+        except ImportError as e:
+            messagebox.showerror("Erro de Importação", f"Erro ao importar FormProdutoWindow: {str(e)}")
+            import traceback
+            traceback.print_exc()
+        except Exception as e:
+            messagebox.showerror("Erro", f"Erro ao abrir formulário de produto: {str(e)}")
+            import traceback
+            traceback.print_exc()
     
     def editar_produto(self):
         """Edita produto selecionado"""
@@ -203,12 +240,23 @@ class CadastrosPanel:
             messagebox.showwarning("Aviso", "Selecione um produto para editar!")
             return
         
-        item = self.tree_produtos.item(selection[0])
-        produto_id = item['values'][0]
-        
-        from ui_form_produto import FormProdutoWindow
-        root_window = self.parent.winfo_toplevel()
-        FormProdutoWindow(root_window, self.produtos, produto_id=produto_id, callback=self.load_produtos)
+        try:
+            item = self.tree_produtos.item(selection[0])
+            produto_id = item['values'][0]
+            
+            from ui_form_produto import FormProdutoWindow
+            root_window = self.parent.winfo_toplevel()
+            # Verificar se produtos está inicializado
+            if not hasattr(self, 'produtos') or self.produtos is None:
+                self.produtos = Produtos()
+            # Criar instância do formulário de PRODUTO
+            form = FormProdutoWindow(root_window, self.produtos, produto_id=produto_id, callback=self.load_produtos)
+            if not form or not hasattr(form, 'window'):
+                raise Exception("Falha ao criar formulário de produto")
+        except Exception as e:
+            messagebox.showerror("Erro", f"Erro ao abrir formulário de produto: {str(e)}")
+            import traceback
+            traceback.print_exc()
     
     def voltar_dashboard(self):
         """Volta para o dashboard"""
